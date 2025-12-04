@@ -7,6 +7,9 @@ Escriba el codigo que ejecute la accion solicitada en cada pregunta.
 
 
 def pregunta_01():
+    import os
+    import zipfile
+    import pandas as pd
     """
     La información requerida para este laboratio esta almacenada en el
     archivo "files/input.zip" ubicado en la carpeta raíz.
@@ -71,3 +74,29 @@ def pregunta_01():
 
 
     """
+    with zipfile.ZipFile("files/input.zip", "r") as zip_ref:
+        zip_ref.extractall("files")
+
+    test = []
+    for folder in ["test"]:
+        for sentiment in ["negative", "positive", "neutral"]:
+            for file in os.listdir(f"files/input/{folder}/{sentiment}"):
+                with open(f"files/input/{folder}/{sentiment}/{file}", "r") as f:
+                    test.append({"phrase": f.read(), "target": sentiment})
+
+    train = []
+    for folder in ["train"]:
+        for sentiment in ["negative", "positive", "neutral"]:
+            for file in os.listdir(f"files/input/{folder}/{sentiment}"):
+                with open(f"files/input/{folder}/{sentiment}/{file}", "r") as f:
+                    train.append({"phrase": f.read(), "target": sentiment})
+
+    df_test = pd.DataFrame(test)
+    df_train = pd.DataFrame(train)
+
+    os.makedirs("files/output", exist_ok=True)
+    df_train.to_csv("files/output/train_dataset.csv", index=False)
+    df_test.to_csv("files/output/test_dataset.csv", index=False)
+
+pregunta_01()
+
